@@ -2,6 +2,7 @@ package br.com.farol.manutencaoapi.service;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -14,6 +15,7 @@ import org.springframework.validation.annotation.Validated;
 
 import br.com.farol.manutencaoapi.entity.Item;
 import br.com.farol.manutencaoapi.exception.EntidadeDeletadaException;
+import br.com.farol.manutencaoapi.exception.RegistroNaoEncontradoException;
 import br.com.farol.manutencaoapi.repository.ItensRepository;
 
 @Service
@@ -29,15 +31,16 @@ public class ItemService {
 		if (item.getIsDeletado() == 1) {
 			throw new EntidadeDeletadaException();
 		}
+		item.setDataDeMovimentacao(LocalDateTime.now());
 		return repository.save(item);
 	}
 
 	public Item buscarPor(@NotNull Integer id) {
-		return repository.buscarPor(id);
-	}
-	
-	public Item buscarPor(@NotNull String codigo) {
-		return repository.buscarPor(codigo);
+		Item item = repository.buscarPor(id);
+		if (item == null) {
+			throw new RegistroNaoEncontradoException("Nenhum registro encontrado");
+		}
+		return item;
 	}
 
 	public List<Item> listarPor(@NotEmpty String descricao) {
@@ -54,6 +57,7 @@ public class ItemService {
 		if (item.getIsDeletado() == 1) {
 			throw new EntidadeDeletadaException();
 		}
+		item.setDataDeMovimentacao(LocalDateTime.now());
 		return repository.save(item);
 	}
 

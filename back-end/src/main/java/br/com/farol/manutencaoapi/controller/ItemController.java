@@ -44,11 +44,6 @@ public class ItemController {
 	public ResponseEntity<?> buscarPor(@PathVariable(name = "id") Integer id) {
 		return ResponseEntity.ok(mapConverter.toJsonMap(service.buscarPor(id)));
 	}
-
-	@GetMapping("/codigo/{codigo}")
-	public ResponseEntity<?> buscarPor(@PathVariable(name = "codigo") String codigo) {
-		return ResponseEntity.ok(mapConverter.toJsonMap(service.buscarPor(codigo)));
-	}
 	
 	@PutMapping
 	public ResponseEntity<?> alterar(@RequestBody Map<String, Object> itemMap) {
@@ -60,10 +55,14 @@ public class ItemController {
 	@GetMapping("/descricao/{descricao}")
 	public ResponseEntity<?> listarPor(@PathVariable(name = "descricao") String descricao) {
 		List<Item> lista = null;
-		if (descricao.isBlank()) {
-			lista = service.listarTodos();
-		}
 		lista = service.listarPor(descricao);
+		return ResponseEntity.ok(mapConverter.toJsonList(lista));
+	}
+	
+	@GetMapping("/descricao/")
+	public ResponseEntity<?> listarTodos() {
+		List<Item> lista = null;
+		lista = service.listarTodos();
 		return ResponseEntity.ok(mapConverter.toJsonList(lista));
 	}
 	

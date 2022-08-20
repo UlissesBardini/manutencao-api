@@ -10,7 +10,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
@@ -43,11 +42,6 @@ public class Item {
 	@Column(name = "codigo")
 	private String codigo;
 
-	@NotEmpty(message = "O numero de série é obrigatório")
-	@Size(max = 5, message = "O número de série deve possuir 5 dígitos")
-	@Column(name = "numero_de_serie")
-	private String numeroDeSerie;
-
 	@NotNull(message = "A disponibilidade é obrigatória")
 	@Enumerated(EnumType.STRING)
 	@Column(name = "disponibilidade")
@@ -61,15 +55,13 @@ public class Item {
 	@NotEmpty(message = "O número de série é obrigatório")
 	@Size(max = 100, message = "A descrição não pode possuir mais de 100 caracteres")
 	@Column(name = "descricao")
-	private String Descricao;
+	private String descricao;
 
-	@NotEmpty(message = "A localização � obrigatória")
+	@NotEmpty(message = "A localização é obrigatória")
 	@Size(max = 250, min = 3, message = "A localização deve possuir entre 3 e 250 caracteres")
-	@Column(name = "descricao")
+	@Column(name = "localizacao")
 	private String localizacao;
 
-	@FutureOrPresent(message = "A data de movimentação não pode ser anterior a atual")
-	@NotNull(message = "A data de movimentação é obrigatória")
 	@Column(name = "dt_movimentacao")
 	private LocalDateTime dataDeMovimentacao;
 

@@ -12,16 +12,16 @@ import br.com.farol.manutencaoapi.entity.Item;
 @Repository
 public interface ItensRepository extends JpaRepository<Item, Integer> {
 
-	@Query("SELECT i FROM Item i WHERE i.id = :id AND deleted = 0")
+	@Query("SELECT i FROM Item i WHERE i.id = :id AND isDeletado = 0")
 	public Item buscarPor(@Param("id") Integer id);
 
-	@Query("SELECT i FROM Item i WHERE i.codigo = :codigo AND deleted = 0")
+	@Query("SELECT i FROM Item i WHERE i.codigo = :codigo AND isDeletado = 0")
 	public Item buscarPor(@Param("codigo") String codigo);
 
-	@Query("SELECT i FROM Item i WHERE deleted = 0")
+	@Query("SELECT i FROM Item i WHERE isDeletado = 0")
 	public List<Item> ListarTodos();
 
-	@Query("SELECT i FROM Item i WHERE i.descricao = :desc AND deleted = 0")
+	@Query("SELECT i FROM Item i WHERE i.descricao LIKE :desc AND isDeletado = 0")
 	public List<Item> listarPor(@Param("desc") String descricao);
 	
 }
