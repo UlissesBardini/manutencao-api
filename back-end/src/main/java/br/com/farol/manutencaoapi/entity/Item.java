@@ -52,7 +52,7 @@ public class Item {
 	@Column(name = "status")
 	private Status status;
 
-	@NotEmpty(message = "O número de série é obrigatório")
+	@NotEmpty(message = "A descrição é obrigatória")
 	@Size(max = 100, message = "A descrição não pode possuir mais de 100 caracteres")
 	@Column(name = "descricao")
 	private String descricao;
@@ -68,7 +68,7 @@ public class Item {
 	@NotNull(message = "isDeletado é obrigatório")
 	@Column(name = "deleted")
 	@Max(value = 1, message = "O valor só pode ser 1 ou 0")
-	@PositiveOrZero
+	@PositiveOrZero(message = "O valor só pode ser 1 ou 0")
 	private Integer isDeletado = 0;
 
 }

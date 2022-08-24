@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.11/jquery.mask.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+  <title>Cadastro de Item</title>
+</head>
+
+<body>
+
+  <div id="app"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"
+  integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
+  crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js" crossorigin="anonymous"></script>
+
+<script>
+const http = axios.create({
+  baseURL: "http://localhost:8080/itens",
+  headers: {
+    "Content-type": "application/json"
+  }
+});
+
+class Client {
+  listarTodos() {
+    return http.get("/descricao/");
+  }
+  buscar(id) {
+    return http.get(`/id/${id}`);
+  }
+  inserir(data) {
+    return http.post("", data);
+  }
+  alterar(data) {
+    return http.put("",data);
+  }
+  excluir(id) {
+    return http.delete(`/id/${id}`);
+  }
+  listarPor(descricao) {
+    return http.get(`/descricao/${descricao}`);
+  }
+}
+
+const client = new Client();
+
+app = new Vue({
+  el:'#app',
+  template:`
+    <div class="container">
+      <div class="modal fade" id="cadastro-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="titulo">Cadastro de Item</h5>
+              <h5 type="button" class="close" v-on:click="fecharCadastro" aria-label="Fechar">
+                <span aria-hidden="true">&times;</span>
+              </h5>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                <p>
+                  <div class="col">
+                    <label for="codigo">Código: </label>
+                    <input placeholder="ABC1234" type="text" id="codigo" maxlength="7" class="form-control" required v-model="item.codigo"/>
+                  </div>
+                  <div class="col">
+                    <label for="disponibilidade" >Disponibilidade:</label>
+                    <select id="disponibilidade" class="form-control" required v-model="item.disponibilidade">
+                      <option value="D">Disponível</option>
+                      <option value="I">Indisponível</option>
+                    </select>
+                  </div>
+                  <div class="col">
+                    <label for="status">Status:</label>
+                    <select id="status" class="form-control" required v-model="item.status">
+                      <option value=A>Ativo</option>
+                      <option value=I>Inativo</option>
+                    </select>
+                  </div>
+                </p>
+              </div>
+              <p>
+                <label for="descricao">Descrição: </label>
+                <input type="text" placeholder="Digite a descrição do item" id="descricao" maxlength="100"
+                  class="form-control" required v-model="item.descricao"/>
+              </p>
+              <p>
+                <label for="localizacao">Localização: </label>
+                <textarea placeholder="Digite a localização do item" id="localizacao" maxlength="250"
+                  class="form-control" required v-model="item.localizacao"></textarea>
+              </p>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary" v-on:click="salvarItem">Cadastrar</button>
+            </div>
+          </div>  
+        </div>
+      </div>
+      <div class="modal fade" id="fechar-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5>Confirmação</h5>
+              <h5 type="button" data-dismiss="modal" aria-label="Fechar">
+                <span aria-hidden="true">&times;</span>
+              </h5>
+            </div>
+            <div class="modal-body">
+              <p>Deseja realmente excluir?</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+              <button type="button" class="btn btn-primary" data-dismiss="modal" v-on:click="excluirItem(itemSelecionado)" v-bind:itemSelecionado="itemSelecionado">Excluir</button>
+            </div>
+          </div>  
+        </div>
+      </div>
+      <div>
+        <p>
+          <p>
+            <h1>Listagem de Itens</h1>
+          </p>
+          <div class="row">
+            <div class="col">
+              <button type="button" class="btn btn-primary" data-target="#cadastro-modal" v-on:click="novoItem">Adicionar Item</button>
+            </div> 
+            <div class="col">
+              <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="Filtro" aria-label="Filtro" aria-describedby="filtro" v-model="filtro">
+                  <button class="btn btn-primary" type="button" v-on:click="pesquisar">Pesquisar</button>
+              </div>
+            </div>
+          </div>
+          <div v-if="isItensNaoVazio"> 
+            <table class = "table table-hover">
+              <thead>
+                <tr>
+                  <th scope="col">Nº de Série</th>
+                  <th scope="col" style="width: 20%">Descrição</th>
+                  <th scope="col">Código</th>
+                  <th scope="col">Disponibilidade</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Data de movimentação</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="iten in itens">
+                  <th scope="row">{{ numeroDeSerie(iten.id) }}</th>
+                  <td>{{ formatarDescricao(iten.descricao) }}</td>
+                  <td>{{ iten.codigo }}</td>
+                  <td class="text-center">{{ iten.disponibilidade }}</td>
+                  <td class="text-center">{{ iten.status }}</td>
+                  <td>{{ mostrarData(iten.dataDeMovimentacao) }}</td>
+                  <td><a href="#" v-on:click.prevent="setItem(iten)">Editar</a>&nbsp;&nbsp;<a href="#" data-toggle="modal" data-target="#fechar-modal" v-on:click.prevent="setItemSelecionado(iten.id)">Excluir</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>  
+          <div v-if="!isItensNaoVazio">
+            <p>Nenhum item encontrado</p>
+          </div>
+        </p>
+      </div>
+    </div>
+  `,
+  data() {
+    return {
+      item: {
+        id: null,
+        codigo: "",
+        descricao: "",
+        localizacao: "",
+        disponibilidade: "D",
+        status: "A",
+        dataDeMovimentacao: "",
+        isDeletado: 0
+      },
+      itens: [],
+      filtro: "",
+      itemSelecionado: 0,
+      message: ""
+    }
+  },
+  methods: {
+    fecharCadastro() {
+      $('#cadastro-modal').modal('toggle');
+    },
+    novoItem() {
+      this.item = {
+        id: null,
+        codigo: "",
+        descricao: "",
+        localizacao: "",
+        disponibilidade: "D",
+        status: "A",
+        dataDeMovimentacao: "",
+        isDeletado: 0
+      };
+      $('#cadastro-modal').modal('toggle');
+    },
+    setItem(item){
+      this.item = {
+        id: item.id,
+        codigo: item.codigo,
+        descricao: item.descricao,
+        localizacao: item.localizacao,
+        disponibilidade: item.disponibilidade,
+        status: item.status,
+        dataDeMovimentacao: "",
+        isDeletado: 0
+      };
+      $('#cadastro-modal').modal('toggle');
+    },
+    salvarItem() {
+      data = {
+        id: this.item.id,
+        codigo: this.item.codigo.trim(),
+        descricao: this.item.descricao.trim(),
+        localizacao: this.item.localizacao.trim(),
+        disponibilidade: this.item.disponibilidade,
+        status: this.item.status,
+        dataDeMovimentacao: "",
+        isDeletado: 0
+      };
+
+      if (data.id === null) {
+        client.inserir(data)
+        .then(response => {
+          alert("Item salvo com sucesso!");
+          $('#cadastro-modal').modal('toggle');
+          this.listarItens();
+        })
+        .catch(e => {
+          errorList = JSON.parse(JSON.stringify(e.response)).data.erros;
+          alert("Ocorreram alguns erros: " + errorList.map(x => {
+            return "\n" + x.mensagem
+          }));
+        });
+      } else {
+        client.alterar(data)
+        .then(response => {
+          alert("Item alterado com sucesso!");
+          $('#cadastro-modal').modal('toggle');
+          this.listarItens();
+        })
+        .catch(e => {
+          errorList = JSON.parse(JSON.stringify(e.response)).data.erros;
+          alert("Ocorreram alguns erros: " + errorList.map(x => {
+            return "\n" + x.mensagem
+          }));
+        });
+      }            
+    },
+    listarItens() {
+      client.listarTodos()
+        .then(response => {
+          this.itens = response.data;
+        })
+        .catch(e => {
+          console.log(e);
+        });
+    },
+    pesquisar() {
+      client.listarPor(this.filtro)
+        .then(response => {
+          this.itens = response.data;
+        })
+        .catch(e => {
+          console.log(e);
+        });
+    },
+    excluirItem(id) {
+      try {
+        client.excluir(id);
+        alert("Item excluído com sucesso!");
+      } catch (e) {
+        console.log(e);
+      }
+      this.listarItens();
+    },
+    setItemSelecionado(item) {
+      this.itemSelecionado = item;
+    },
+    numeroDeSerie(id) {
+      var zeros = "";
+      for (var i=0; i < 5 - id.toString().length; i++) {
+        zeros += "0";
+      }
+      return zeros + id.toString();
+    },
+    mostrarData(date) {
+      var dt = date.toString().split(/[\-T\.]/);
+      return dt[2] + "/" + dt[1] + "/" + dt[0] + " " + dt[3];
+    },
+    formatarDescricao(desc) {
+    if (desc.length > 50 && !desc.slice(0,51).includes(' ')) {
+      return desc.slice(0,51) + "-\n" + desc.slice(51,desc.length);
+    }
+    return desc;
+    }
+  },
+  computed: {
+    isItensNaoVazio() {
+      return this.itens && this.itens.length > 0;
+    }
+  },
+  mounted() {
+    this.listarItens();
+  }
+})
+</script>
+
+</body>
+
+</html>

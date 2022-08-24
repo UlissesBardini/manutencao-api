@@ -18,10 +18,10 @@ public interface ItensRepository extends JpaRepository<Item, Integer> {
 	@Query("SELECT i FROM Item i WHERE i.codigo = :codigo AND isDeletado = 0")
 	public Item buscarPor(@Param("codigo") String codigo);
 
-	@Query("SELECT i FROM Item i WHERE isDeletado = 0")
+	@Query("SELECT i FROM Item i WHERE isDeletado = 0 ORDER BY id DESC")
 	public List<Item> ListarTodos();
 
-	@Query("SELECT i FROM Item i WHERE i.descricao LIKE :desc AND isDeletado = 0")
+	@Query("SELECT i FROM Item i WHERE Upper(i.descricao) LIKE Upper(:desc) AND isDeletado = 0 ORDER BY id DESC")
 	public List<Item> listarPor(@Param("desc") String descricao);
 	
 }
